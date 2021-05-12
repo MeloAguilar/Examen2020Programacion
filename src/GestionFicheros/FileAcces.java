@@ -86,7 +86,7 @@ public class FileAcces {
      *         <h3>Epi</h3>
      *         <li>parte</li>
      *         <li>material</li>
-     *         <li>.endsWith("!")</li>
+     *         <li>.endsWith("?")</li>
      *     </ol>
      *     <ol>
      *         <h3>Medicamento</h3>
@@ -98,7 +98,7 @@ public class FileAcces {
      * @param stFile
      * @return
      */
-    public static Producto montarProducto(String[] stFile) {
+     public static Producto montarProducto(String[] stFile) {
         LocalDate fechaCaducidad = null;
         double precio;
         Presentacion presentacion;
