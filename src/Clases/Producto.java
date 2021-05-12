@@ -4,6 +4,10 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
+ *
+ * El string va a tener el siguiente orden
+ * --
+ * --
  * La clase producto será una clase padre de EPI y de Medicamento
  */
 public abstract class Producto <Comparable>{
@@ -48,6 +52,7 @@ public abstract class Producto <Comparable>{
         this.precio = precio;
     }
 
+
  public int compareTo(Producto p2){
         return this.getCodigoBarras().compareTo(p2.getCodigoBarras());
  }
@@ -64,8 +69,7 @@ public abstract class Producto <Comparable>{
 
     @Override
     public String toString() {
-        return "Producto{" +
-                "CodigoBarras='" + CodigoBarras + '\'' +
+        return "CodigoBarras='" + CodigoBarras + '\'' +
                 ", nombre='" + nombre + '\'' +
                 ", fechaCaducidad=" + fechaCaducidad +
                 ", precio=" + precio;

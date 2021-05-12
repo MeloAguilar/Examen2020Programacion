@@ -1,7 +1,7 @@
 package ÇEnums;
 
 public enum Presentacion{
-    C("Comprmidos"),G("Gotas"),S("Suspension");
+    C("Comprimidos"),G("Gotas"),S("Suspension");
 
 
     private String extension;

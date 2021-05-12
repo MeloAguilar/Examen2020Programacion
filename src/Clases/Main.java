@@ -14,5 +14,8 @@ public class Main {
         FileAcces tt = new FileAcces();
         tt.introducirProducto(p);
         tt.introducirProductosEnFichero();
+        String coso = FileAcces.txtReader(FileAcces.archivoProductos);
+       Producto producto = FileAcces.montarProducto(coso);
+        System.out.println(producto);
     }
 }
