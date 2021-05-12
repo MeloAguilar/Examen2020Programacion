@@ -69,9 +69,9 @@ public abstract class Producto <Comparable>{
 
     @Override
     public String toString() {
-        return "CodigoBarras='" + CodigoBarras + '\'' +
-                ", nombre='" + nombre + '\'' +
-                ", fechaCaducidad=" + fechaCaducidad +
-                ", precio=" + precio;
+        return CodigoBarras +
+                "," + nombre +
+                "," + fechaCaducidad +
+                "," + precio;
     }
 }

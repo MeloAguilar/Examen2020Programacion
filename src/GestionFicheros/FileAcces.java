@@ -13,11 +13,11 @@ import java.util.List;
 public class FileAcces {
 
     private static final String PATH = ".\\src\\Ficheros\\Antipandemia.txt";
-    public static File archivoProductos = new File(PATH);
+    public static File archivoProductos = new File (PATH);
     private List<Producto> productos;
 
     public FileAcces() {
-        this.productos = new LinkedList<>();
+        this.productos = new LinkedList<> ( );
     }
 
     /**
@@ -29,7 +29,7 @@ public class FileAcces {
     public boolean introducirProducto(Producto p) {
         boolean success = false;
         if (p instanceof Medicamento || p instanceof Epi) {
-            productos.add(p);
+            productos.add (p);
             success = true;
         }
         return success;
@@ -39,121 +39,113 @@ public class FileAcces {
     public File introducirProductosEnFichero() {
         BufferedWriter br = null;
         try {
-            br = new BufferedWriter(new FileWriter(archivoProductos, true));
+            br = new BufferedWriter (new FileWriter (archivoProductos, true));
             for (Producto pr : productos) {
-                if (!br.toString().isBlank())
-                    br.newLine();
-                br.write(pr.toString());
+                if (!br.toString ( ).isBlank ( ))
+                    br.newLine ( );
+                br.write (pr.toString ( ));
 
             }
         } catch (IOException e) {
-            System.out.println("something was not what i expected");
+            System.out.println ("something was not what i expected");
         } finally {
             assert br != null;
-            cerrarFlujo(br);
+            cerrarFlujo (br);
         }
         return this.archivoProductos;
     }
 
 
-    private static void cerrarFlujo(AutoCloseable flujo)  {
+    /**
+     * @param flujo
+     */
+    private static void cerrarFlujo(AutoCloseable flujo) {
         try {
-
-            flujo.close();
+            flujo.close ( );
         } catch (Exception t) {
-
+            //No hace nada(Añadir algo)
         }
     }
 
-    public boolean rellenarFichero() {
-        boolean success = false;
-        BufferedWriter br = null;
-        try {
-            br = new BufferedWriter((new FileWriter(archivoProductos, true)));
-        } catch (IOException e) {
-
-        } finally {
-            try {
-                assert br != null;
-                br.close();
-            } catch (IOException r) {
-
-            }
-        }
-        return success;
+    public static String[] devolverArrayDeObjetos(String fileString){
+        String[] objectsArray = fileString.split ("!");
+        return objectsArray;
     }
 
-    public static Producto montarProducto(String stFile){
-        String codigoBarras = "";
-        String nombre = "";
+    /**
+     *
+     * Método que devuelve
+     * Criterio de inserción
+     * <ol>
+     *     <h3>Comunes</h3>
+     *     <li>codigoBarras</li>
+     *     <li>nombre</li>
+     *     <li>fechaCaducidad</li>
+     *     <li>precio</li>
+     *     <ol>
+     *         <h3>Epi</h3>
+     *         <li>parte</li>
+     *         <li>material</li>
+     *         <li>.endsWith("!")</li>
+     *     </ol>
+     *     <ol>
+     *         <h3>Medicamento</h3>
+     *         <li>presentacion</li>
+     *         <li>principioActivo</li>
+     *         <li>.endsWith(":")</li>
+     *     </ol>
+     * </ol>
+     * @param stFile
+     * @return
+     */
+    public static Producto montarProducto(String[] stFile) {
         LocalDate fechaCaducidad = null;
-        double precio = 0;
-        Presentacion presentacion = null;
-        String principioActivo = "";
-        ParteCuerpoEPI parte = null;
-        String material = "";
-
+        double precio;
+        Presentacion presentacion;
+        ParteCuerpoEPI parte;
         Producto n = null;
-        String[] stringArray = stFile.split(", ");
-        for (String atributo : stringArray) {
-            String[] atributoValor = atributo.split("=");
-            String atributo1 = atributoValor[0];
-            String valor = atributoValor[1];
-            switch (atributo1) {
-                case "codigoBarras" -> {
-                    codigoBarras = valor;
-                }
-                case "nombre" -> {
-                    nombre = valor;
-                }
-                case "fechaCaducidad" -> {
-                    String fecha = valor;
-                    fechaCaducidad = LocalDate.parse(fecha, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                }
-                case "precio" -> {
-                    precio = Double.parseDouble(valor);
-                }
-                case "presentacion" -> {
-                    presentacion = Presentacion.valueOf(valor);
-                }
-                case "principioActivo" -> {
-                    principioActivo = valor;
-                }
-                case "parte" ->{
-                    parte = ParteCuerpoEPI.valueOf(valor);
-                }
-                case "material" ->{
-                    material = valor;
-                }
-
+        int contador = 0;
+        //Creamos un array de cadenas gracias a .split
+        for(String atributos : stFile){
+            String[] stringArray = atributos.split (",");
+            //Se da valor a los atributos comunes
+            fechaCaducidad = LocalDate.parse (stringArray[1], DateTimeFormatter.ofPattern ("yyyy-MM-dd"));
+            precio = Double.parseDouble (stringArray[3]);
+            //Comprobamos si es un Epi o un Medicamento por el último caracter de sus toString
+            if(atributos.endsWith (":")){
+                presentacion = Presentacion.valueOf (stringArray[4]);
+                n = new Medicamento (stringArray[0], stringArray[1], fechaCaducidad, precio, presentacion, stringArray[5]);
+            } else if(atributos.endsWith ("?")) {
+                parte = ParteCuerpoEPI.valueOf (stringArray[4]);
+                n = new Epi (stringArray[0], stringArray[1], fechaCaducidad, precio,parte,stringArray[5]);
             }
-
         }
 
-        if(parte == null){
-            n = new Medicamento(codigoBarras,nombre,fechaCaducidad,precio,presentacion,principioActivo);
-        }else{
-            n = new Epi(codigoBarras,nombre,fechaCaducidad,precio,parte,material);
-        }
+
+
         return n;
     }
 
 
+    /**
+     * @param file
+     * @return
+     */
     public static String txtReader(File file) {
         var loco = "";
         String madreMia;
         BufferedReader input = null;
         try {
-            input = new BufferedReader(new FileReader(file));//Creamos el lector de Strings
-            while ((madreMia = input.readLine()) != null) {
+            input = new BufferedReader (new FileReader (file));//Creamos el lector de Strings
+            while ((madreMia = input.readLine ( )) != null) {
                 // mientras que la linea de Strings que lee input no sea null
                 loco += madreMia + "\n";
             }//end while
         }//End try
         catch (IOException e) {
-            System.out.println("Can´t open the file");
-                assert input != null;
-                cerrarFlujo(input);
+            System.out.println ("Can´t open the file");
+            assert input != null;
+            cerrarFlujo (input);
         }
         return loco;
     }
