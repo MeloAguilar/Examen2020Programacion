@@ -1,0 +1,6 @@
+Medicamento,QWET12354D,AeroRed,2023-04-23,3.45,C,Gaseador
+Epi,WTFDSRWEF23DF,Mascarilla,2021-05-13,2.3,C,Caucho
+Medicamento,QWET1UIO54D,AeroRed,2023-04-23,4.45,C,Gaseador
+Epi,WTFDSRIURJWEF23DF,Mascarilla fachera,2021-05-13,2.3,O,Caucho
+Epi,WTFDSRWERWQEF23DF,Tapaojos,2021-05-13,2.3,O,Caucho
+Medicamento,PEROTY54BSI,Paracetamol,2023-04-23,4.45,G,Gaseador
