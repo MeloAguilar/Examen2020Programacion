@@ -4,7 +4,7 @@ import ÇEnums.ParteCuerpoEPI;
 
 import java.time.LocalDate;
 
-public class Epi extends Producto{
+public class Epi extends Producto {
 
     //Atributos
     private ParteCuerpoEPI parte;
@@ -36,8 +36,8 @@ public class Epi extends Producto{
 
     @Override
     public String toString() {
-        return  super.toString() +
+        return "Epi," + super.toString() +
                 "," + parte +
-                "," + material + "?!";
+                "," + material;
     }
 }

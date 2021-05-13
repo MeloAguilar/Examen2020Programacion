@@ -4,13 +4,13 @@ import ÇEnums.Presentacion;
 
 import java.time.LocalDate;
 
-public class Medicamento extends Producto{
+public class Medicamento extends Producto {
 
     private Presentacion presentacion;
     private String principioActivo;
 
 
-    public Medicamento(String codigoBarras, String nombre, LocalDate fechaCaducidad, double precio,Presentacion presentacion, String principioActivo) {
+    public Medicamento(String codigoBarras, String nombre, LocalDate fechaCaducidad, double precio, Presentacion presentacion, String principioActivo) {
         super(codigoBarras, nombre, fechaCaducidad, precio);
         this.presentacion = presentacion;
         this.principioActivo = principioActivo;
@@ -34,8 +34,8 @@ public class Medicamento extends Producto{
 
     @Override
     public String toString() {
-        return super.toString() +
+        return "Medicamento," + super.toString() +
                 "," + presentacion +
-                "," + principioActivo+":!" ;
+                "," + principioActivo;
     }
 }

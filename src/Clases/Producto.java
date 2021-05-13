@@ -1,18 +1,19 @@
 package Clases;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- *
  * El string va a tener el siguiente orden
  * --
  * --
  * La clase producto será una clase padre de EPI y de Medicamento
  */
-public abstract class Producto <Comparable>{
+public abstract class Producto implements Comparable {
     //Atributos
-    private String CodigoBarras;
+    private String codigoBarras;
     private String nombre;
     private LocalDate fechaCaducidad;
     private double precio;
@@ -22,16 +23,15 @@ public abstract class Producto <Comparable>{
 
 
     public Producto(String codigoBarras, String nombre, LocalDate fechaCaducidad, double precio) {
-        CodigoBarras = codigoBarras;
+        this.codigoBarras = codigoBarras;
         this.nombre = nombre;
         this.fechaCaducidad = fechaCaducidad;
         this.precio = precio;
     }
 
     public String getCodigoBarras() {
-        return CodigoBarras;
+        return codigoBarras;
     }
-
 
 
     public String getNombre() {
@@ -53,23 +53,42 @@ public abstract class Producto <Comparable>{
     }
 
 
- public int compareTo(Producto p2){
-        return this.getCodigoBarras().compareTo(p2.getCodigoBarras());
- }
-
-
-    public boolean equals(Producto o) {
-        return Objects.equals(CodigoBarras, o.CodigoBarras);
+    @Override
+    public int compareTo(Object o) {
+        int comp;
+        if(o == null)
+            throw new NullPointerException();
+        if(o instanceof Producto) {
+            Producto p = (Producto) o;
+            comp = this.getCodigoBarras().compareTo(p.getCodigoBarras());
+    }else{
+            throw new ClassCastException();
+        }
+        return comp;
     }
 
     @Override
+    public boolean equals(Object o) {
+        boolean eq = false;
+        if (this == o) {
+            eq = true;
+        }
+        if ((o instanceof Producto)) {
+            Producto p = (Producto) o;
+            eq = codigoBarras.equals(p.codigoBarras);
+        }
+        return eq;
+    }
+
+
+    @Override
     public int hashCode() {
-        return Objects.hash(CodigoBarras);
+        return Objects.hash(codigoBarras);
     }
 
     @Override
     public String toString() {
-        return CodigoBarras +
+        return codigoBarras +
                 "," + nombre +
                 "," + fechaCaducidad +
                 "," + precio;
