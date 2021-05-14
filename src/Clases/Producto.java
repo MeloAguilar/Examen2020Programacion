@@ -2,6 +2,7 @@ package Clases;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -11,7 +12,7 @@ import java.util.Objects;
  * --
  * La clase producto será una clase padre de EPI y de Medicamento
  */
-public abstract class Producto implements Comparable {
+public abstract class Producto implements Comparable, Serializable {
     //Atributos
     private String codigoBarras;
     private String nombre;

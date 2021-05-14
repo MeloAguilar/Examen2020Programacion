@@ -5,6 +5,7 @@ import ÇEnums.ParteCuerpoEPI;
 import ÇEnums.Presentacion;
 
 import java.io.*;
+import java.nio.BufferUnderflowException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
@@ -163,20 +164,60 @@ public class FileAcces {
         String[] productoArray;
         Producto n = null;
         productoArray = prodString.split(",");
-        if(!(productoArray.length <= 1)) {
+        if((productoArray.length > 0)) {
             //Se da valor a los atributos comunes
             fechaCaducidad = LocalDate.parse(productoArray[3], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             precio = Double.parseDouble(productoArray[4]);
             //Comprobamos si es un Epi o un Medicamento por la primera posicion del array
-            if (productoArray[0].equals("Medicamento")) {
-                presentacion = Presentacion.valueOf(productoArray[5]);
-                n = new Medicamento(productoArray[1], productoArray[2], fechaCaducidad, precio, presentacion, productoArray[6]);
-            } else if (productoArray[0].equals("Epi")) {
-                parte = ParteCuerpoEPI.valueOf(productoArray[5]);
-                n = new Epi(productoArray[1], productoArray[2], fechaCaducidad, precio, parte, productoArray[6]);
+            switch(productoArray[0]){
+                case "Medicamento" -> {
+                    presentacion = Presentacion.valueOf(productoArray[5]);
+                    n = new Medicamento(productoArray[1], productoArray[2], fechaCaducidad, precio, presentacion, productoArray[6]);
+                }
+                case "Epi" -> {
+                    parte = ParteCuerpoEPI.valueOf(productoArray[5]);
+                    n = new Epi(productoArray[1], productoArray[2], fechaCaducidad, precio, parte, productoArray[6]);
+                }
             }
         }
         return n;
+    }
+
+
+    public static boolean eliminarProducto(String codigoBarras){
+        File fichAux = new File("src\\Ficheros\\fichAux.txt");
+
+        BufferedReader brFichMaster = null;
+        boolean exit = false;
+        BufferedReader brFichAux = null;
+        BufferedWriter bwFichMaster = null;
+        BufferedWriter bwFichAux = null;
+        String lineaLeida = "";
+        String lineaLeidaAux = "";
+        try{
+            fichAux.createNewFile();
+            brFichMaster = new BufferedReader(new FileReader(FileAcces.archivoProductos));
+            brFichAux = new BufferedReader(new FileReader(fichAux));
+            bwFichAux = new BufferedWriter(new FileWriter(fichAux));
+            bwFichMaster = new BufferedWriter(new FileWriter(FileAcces.archivoProductos));
+            while((lineaLeida = brFichMaster.readLine()) != null){
+                if(!lineaLeida.split(",")[1].equals(codigoBarras)){
+                    bwFichAux.write(lineaLeida);
+                    bwFichAux.newLine();
+                }else{
+                    exit = true;
+                }
+            }
+            archivoProductos.delete();
+            while((lineaLeidaAux = brFichAux.readLine()) != null){
+                bwFichMaster.write(lineaLeidaAux);
+                bwFichMaster.newLine();
+            }
+
+        }catch(IOException e){
+            cerrarFlujo(brFichAux);
+        }
+        return exit;
     }
 
 
