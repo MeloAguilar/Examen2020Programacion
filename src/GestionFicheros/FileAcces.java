@@ -7,6 +7,7 @@ import ÇEnums.Presentacion;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,26 +33,8 @@ public class FileAcces {
         return productos;
     }
 
-    /**
-     * Método que sirve para introducir un producto en la lista de productos
-     *
-     * @param p
-     * @return
-     */
-    public boolean introducirProducto(Producto p) {
-        boolean success = false;
-        boolean exit = false;
-        for (Producto pr : this.productos) {
-            if (pr.equals (p)) {
-                exit = true;
-            }
-        }
-        if ((p instanceof Medicamento || p instanceof Epi) && !exit) {
-            productos.add (p);
-            success = true;
-        }
-
-        return success;
+    public File getArchivoAux() {
+        return archivoAux;
     }
 
     /**
@@ -61,7 +44,6 @@ public class FileAcces {
     public File introducirProductoEnFichero(Producto p) {
         BufferedWriter br = null;
         try {
-            //todo quitar
             br = new BufferedWriter (new FileWriter (archivoProductos, true));
             br.write (p.toString ( ));
             br.newLine ( );
@@ -100,7 +82,7 @@ public class FileAcces {
         try {
             input = new BufferedReader (new FileReader (file));//Creamos el lector de Strings
             while ((productoString = input.readLine ( )) != null) {
-                // mientras que la linea de Strings que lee input no sea null
+                //mientras que la linea de Strings que lee input no sea null
                 productos.add (productoString);
             }//end while
         }//End try
@@ -112,6 +94,57 @@ public class FileAcces {
         return productos;
     }
 
+    public boolean validarProducto(Producto p) {
+        boolean success = true;
+        BufferedReader br = null;
+        String linea = "";
+        try {
+            br = new BufferedReader (new FileReader (this.archivoProductos));
+            while ((linea = br.readLine ( )) != null && success) {
+                if (linea.split (",")[1].equals (p.getCodigoBarras ( ))) {
+                    success = false;
+                }
+            }
+        } catch (IOException e) {
+
+        } finally {
+            if (br != null)
+                cerrarFlujo (br);
+        }
+        return success;
+    }
+
+
+    /**
+     * <h2>introducirProductoEnFachero(Producto)</h2>
+     * <p>
+     * Método que introduce un producto en el fichero de productos.
+     * Precondiciones: productoAIntroducir debe ser un producto instanciado.
+     * Postcondiciones: Ninguna
+     * y en caso de ser false, significará que no se ha podido realizar la insercion, ya que el producto no ha podido ser validado
+     *
+     * @param productoAIntroducir
+     * @return
+     */
+    public boolean introducirProductoEnFachero(Producto productoAIntroducir) {
+        boolean success = true;
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter (new FileWriter (this.archivoAux, true));
+            if (validarProducto (productoAIntroducir)) {
+                bw.write (productoAIntroducir.toString ( ));
+                bw.newLine ( );
+            } else {
+                success = false;
+            }
+        } catch (IOException e) {
+
+        } finally {
+            if (bw != null)
+                cerrarFlujo (bw);
+        }
+        return success;
+    }
 
     /**
      * <h2>montarProducto(String[])</h2>
@@ -119,7 +152,7 @@ public class FileAcces {
      * Método que devuelve una Lista de Productos a partir de un Array de cadenas con los siguientes
      * criterios de inserción.
      *
-     * @param listaProductos: Array de cadenas que, en cada posicion contiene todos los atributos de un Objeto Producto
+     * @param file: Array de cadenas que, en cada posicion contiene todos los atributos de un Objeto Producto
      * @return n: Lista de Productos construidos a partir de las cadenas
      * recogidas de un Array de Cadenas
      */
@@ -196,18 +229,20 @@ public class FileAcces {
 
     /**
      * <h2>ordenarArchivoEnLista()</h2>
-     *
+     * <p>
      * Método que ordena los Productos de un archivo en una lista y lo devuelve para ser utilizada en otro
      * método que ordenará el archivo auxiliar
+     *
      * @return
      */
     public List<Producto> ordenarArchivoEnLista() {
-        productos.clear ();
+        productos.clear ( );
         Producto prodCreado;
         String linea = "";
         BufferedReader br = null;
+        BufferedWriter bw = null;
         try {
-            br = new BufferedReader (new FileReader (this.getArchivoProductos ( )));
+            br = new BufferedReader (new FileReader (this.archivoAux));
             while ((linea = br.readLine ( )) != null) {
                 prodCreado = montarProducto (linea);
                 this.productos.add (prodCreado);
@@ -216,27 +251,76 @@ public class FileAcces {
         } catch (IOException e) {
             cerrarFlujo (br);
         }
-        productos.sort (Producto :: compareTo);
+        productos.sort (Producto::compareTo);
         return productos;
+    }
+    public boolean escribirListaEnFicheroAux(List<Producto> productos) {
+        boolean success = true;
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter (new FileWriter (this.archivoAux));
+            for (Producto producto : productos) {
+                bw.write (producto.toString ( ));
+                bw.newLine ( );
+            }
+        } catch (IOException e) {
+            e.printStackTrace ( );
+        } finally {
+            cerrarFlujo (bw);
+        }
+
+        return success;
     }
 
 
-    public boolean consolidarArchivoMaestro(){
+    public boolean consolidarArchivoMaestro() {
         boolean success = true;
         BufferedWriter bw = null;
-        try{
-            bw = new BufferedWriter (new FileWriter (this.archivoAux));
-            for(Producto producto : productos){
-                bw.write (producto.toString ());
-                bw.newLine ();
+        BufferedReader be = null;
+        BufferedReader br = null;
+        String line = "";
+        String lineArchivoMAster = "";
+        try {
+            bw = new BufferedWriter (new FileWriter (this.archivoProductos, true));
+            br = new BufferedReader (new FileReader (this.archivoProductos));
+            be = new BufferedReader (new FileReader (this.archivoAux));
+            while((line = be.readLine ()) != null){
+                if(this.archivoProductos.length () > 0) {
+                    if (!line.split (",")[1].equals (br.readLine ( ).split (",")[1])) {
+                        bw.write (line);
+                        bw.newLine ( );
+                    }
+                }else {
+                    bw.write (line);
+                    bw.newLine ();
+                }
             }
-        }catch(IOException e){
+        } catch (IOException e) {
             cerrarFlujo (bw);
             success = false;
         }
-        this.archivoProductos.delete ();
-        this.archivoAux.renameTo (archivoProductos);
+
         return success;
+    }
+
+    public static List<Producto> mostrarProductos(File file) {
+        BufferedReader br = null;
+        List<Producto> productos = new LinkedList<> ( );
+        String line = "";
+        Producto p;
+        try {
+            br = new BufferedReader (new FileReader (file));
+            while ((line = br.readLine ( )) != null) {
+                p = montarProducto (line);
+                productos.add (p);
+            }
+        } catch (IOException e) {
+            e.printStackTrace ( );
+        } finally {
+            if (br != null)
+                cerrarFlujo (br);
+        }
+        return productos;
     }
 
 

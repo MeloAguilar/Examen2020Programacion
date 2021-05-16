@@ -22,6 +22,8 @@ public class Main {
     public static void main(String[] args) {
         boolean exit = false;
         boolean exit2 = false;
+        boolean exit3 = false;
+        boolean exit4 = false;
         FileAcces tt = new FileAcces ( );
         introducirDatosIniciales (tt);
         do {
@@ -30,21 +32,25 @@ public class Main {
                 //Menú de Impresión.
                 case "1" -> {
                     do {
+                        System.out.println (Menu.MENSAJE_MENU_IMPRESION);
                         switch (sc.nextLine ( )) {
                             //listado de Productos con el mismo nombre
                             case "1" -> {
                                 String nombre = Menu.pedirDato (sc, "el nombre del producto.");
                                 mostrarProductosPorNombre (tt, nombre);
-                                exit2 = true;
                             }
                             //Listado de productos por fecha de caducidad
                             case "2" -> {
-                                LocalDate fecha = LocalDate.parse (Menu.pedirDato (sc, "la fecha de caducidad con formato yyyy-MM-dd"));
+                                LocalDate fecha = Menu.validarFecha (Menu.pedirDato (sc, "La fecha en formato yyyy-MM-dd"));
 
                             }
-                            //
+                            //Imprimir el total en euros del fichero
                             case "3" -> {
 
+                            }
+                            //Salir
+                            case "4" -> {
+                                exit2 = true;
                             }
                             //Mensaje de error
                             default -> {
@@ -55,11 +61,47 @@ public class Main {
                 }
                 //Menú de Cálculos.
                 case "2" -> {
+                    do {
+                        System.out.println (Menu.MENSAJE_MENU_CALCULOS);
+                        switch (sc.nextLine ( )) {
+                            //total de productos comprimidos
+                            case "1" -> {
 
+                            }
+                            //Total de productos gotas
+                            case "2" -> {
+
+                            }
+                            //Total de productos suspensión
+                            case "3" -> {
+
+                            }
+                            //Salir
+                            case "4" -> {
+                                exit3 = true;
+                            }
+                        }
+                    } while (!exit3);
                 }
                 //Menú de Gestión
                 case "3" -> {
+                    do {
+                        System.out.println (Menu.MENSAJE_MENU_GESTION);
+                        switch (sc.nextLine ( )) {
+                            //Añadir producto
+                            case "1" -> {
 
+                            }
+                            //Borrar producto
+                            case "2" -> {
+
+                            }
+                            //Salir
+                            case "3" -> {
+                                exit4 = true;
+                            }
+                        }
+                    } while (!exit4);
                 }
                 //Dato mal introducido
                 default -> {
@@ -97,36 +139,39 @@ public class Main {
         Medicamento medicamento = new Medicamento ("QPEQIUTG4Q96BV",
                 "Ibuprofeno", LocalDate.of (2024, 07, 04),
                 4.6, Presentacion.C, "Vitamina B12");
-        tt.introducirProducto (p);
-        tt.introducirProducto (e);
-        tt.introducirProducto (o);
-        tt.introducirProducto (pp);
-        tt.introducirProducto (jj);
-        tt.introducirProducto (ll);
-        tt.introducirProducto (l);
-        tt.introducirProducto (medi);
-        tt.introducirProducto (medica);
-        tt.introducirProducto (medicamento);
-            //Se introducen los productos en el fichero
-        for (Producto producto : tt.getProductos ( )) {
-            tt.introducirProductoEnFichero (producto);
-        }
+        tt.introducirProductoEnFachero (p);
+        tt.introducirProductoEnFachero (e);
+        tt.introducirProductoEnFachero (o);
+        tt.introducirProductoEnFachero (pp);
+        tt.introducirProductoEnFachero (jj);
+        tt.introducirProductoEnFachero (ll);
+        tt.introducirProductoEnFachero (l);
+        tt.introducirProductoEnFachero (medi);
+        tt.introducirProductoEnFachero (medica);
+        tt.introducirProductoEnFachero (medicamento);
         //Se muestran los productos antes de ser ordenados
         mostrarProductos (tt);
         System.out.println ("********************************************************************************\n" +
                 "   Productos Ordenados \n********************************************************************************"
-            );
+        );
         //Se muestran los productos despues de ser ordenados y consolidados.
-        tt.ordenarArchivoEnLista ();
-        tt.consolidarArchivoMaestro ();
+        List<Producto> productos =  tt.ordenarArchivoEnLista ( );
+        tt.escribirListaEnFicheroAux (productos);
+        tt.consolidarArchivoMaestro ( );
+
         mostrarProductos (tt);
     }
 
 
     private static void mostrarProductos(FileAcces tt) {
-        LinkedList<String> cadenasOrdenadas = (LinkedList<String>) FileAcces.txtReader (tt.getArchivoProductos ( ));
-        for (String cadena : cadenasOrdenadas) {
-            System.out.println (FileAcces.montarProducto (cadena));
+        LinkedList<Producto> cadenasOrdenadas = new LinkedList<> (  );
+        if(tt.getArchivoProductos ().length () < 1) {
+           cadenasOrdenadas = (LinkedList<Producto>) FileAcces.mostrarProductos (tt.getArchivoAux ( ));
+        } else {
+            cadenasOrdenadas = (LinkedList<Producto>) FileAcces.mostrarProductos (tt.getArchivoProductos ());
+        }
+        for(Producto producto : cadenasOrdenadas){
+            System.out.println (producto );
         }
     }
 
@@ -145,7 +190,7 @@ public class Main {
 
 
     private static void mostrarProductosPorNombre(FileAcces fileAcces, String nombreProducto) {
-        File file = fileAcces.getArchivoProductos ( );
+        File file = fileAcces.getArchivoAux ( );
         for (Producto producto : FileAcces.getProductosList (file)) {
             if (producto.getNombre ( ).equals (nombreProducto)) {
                 System.out.println (producto);
